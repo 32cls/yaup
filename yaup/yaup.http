@@ -1,0 +1,11 @@
+@yaup_HostAddress = http://localhost:5042
+
+GET {{yaup_HostAddress}}/todos/
+Accept: application/json
+
+###
+
+GET {{yaup_HostAddress}}/todos/1
+Accept: application/json
+
+###
