@@ -1,14 +1,8 @@
-class Player
+class Player(string? id, string name)
 {
-    public long Id { get; set; }
-    public string Name { get; set; }
+    public string? Id { get; set; } = id;
+    public string Name { get; set; } = name;
     public List<Card> Hand { get; } = [];
-
-    public Player(long id, string name)
-    {
-        Id = id;
-        Name = name;
-    }
 
     public void DisplayHand()
     {

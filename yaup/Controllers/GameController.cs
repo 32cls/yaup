@@ -1,26 +1,57 @@
-class GameController
+class GameController: IGameController
 {
     private static readonly Random rng = new();
-    public void CreateNewGame(List<Player> players)
+
+    public Dictionary<string, Game> Games { get; } = [];
+
+    void IGameController.JoinOrCreateGame(string roomName, Player player)
     {
-        var deck = new Deck();
-        deck.Cards = [.. deck.Cards.OrderBy(_ => rng.Next())];
-        DrawInitialCards(deck, players);
-        deck.Display();
+        Games.TryGetValue(roomName, out Game game);
+        if (game != null)
+        {
+            if (game.Players.Count == 4)
+            {
+                throw new Exception();
+            }
+            else
+            {
+                game.Players.Add(player);
+            }
+        }
+        else
+        {
+            game = new Game();
+            game.Players.Add(player);
+            Games.Add(roomName, game);
+        }
+        game.Deck.Cards = [.. game.Deck.Cards.OrderBy(_ => rng.Next())];
+        game.Deck.Display();
     }
 
-    void DrawInitialCards(Deck deck, List<Player> players)
+    private void DrawInitialCards(Game game)
     {
-        foreach (var player in players)
+        foreach (var player in game.Players)
         {
-            player.Hand.AddRange(deck.Cards.GetRange(0, 3));
-            deck.Cards.RemoveRange(0, 3);
+            player.Hand.AddRange(game.Deck.Cards.GetRange(0, 3));
+            game.Deck.Cards.RemoveRange(0, 3);
         }
-        foreach (var player in players)
+        foreach (var player in game.Players)
         {
-            player.Hand.AddRange(deck.Cards.GetRange(0, 2));
-            deck.Cards.RemoveRange(0, 2);
+            player.Hand.AddRange(game.Deck.Cards.GetRange(0, 2));
+            game.Deck.Cards.RemoveRange(0, 2);
             player.DisplayHand();
         }
+    }
+
+    public void StartGame(string roomName)
+    {
+        Games.TryGetValue(roomName, out Game game);
+        if (game == null)
+        {
+            throw new Exception();
+        }
+        else {
+            DrawInitialCards(game);
+        }        
     }
 }

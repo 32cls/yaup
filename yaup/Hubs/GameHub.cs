@@ -4,12 +4,24 @@ namespace yaup.Hubs
 {
     public class GameHub : Hub
     {
-        public async Task SendMessage(string user, string message)
+        private readonly IGameController _gameController;
+
+        public GameHub(IGameController gameController)
         {
-            var gameController = new GameController();
-            Player[] players = [new Player(1, "Arno"), new Player(2, "Ayoub"), new Player(3, "Jonasz"), new Player(4, "Belle")];
-            gameController.CreateNewGame([.. players]);
-            await Clients.All.SendAsync("ReceiveMessage", user, message);
+            _gameController = gameController;
+        }
+
+        public async Task JoinRoom(string roomName, string userName)
+        {
+            _gameController.JoinOrCreateGame(roomName, new Player(Context.UserIdentifier, userName));                
+            await Groups.AddToGroupAsync(Context.ConnectionId, roomName);
+            await Clients.Group(roomName).SendAsync("ReceiveMessage", roomName, userName);
+        }
+
+        public async Task StartGame(string roomName)
+        {
+            _gameController.StartGame(roomName);
+            await Clients.Group(roomName).SendAsync("ReceiveMessage", roomName);
         }
     }
 }

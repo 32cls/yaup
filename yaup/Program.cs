@@ -20,6 +20,7 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddSignalR(e => e.EnableDetailedErrors = true);
+builder.Services.AddSingleton<IGameController, GameController>();
 
 var app = builder.Build();
 
