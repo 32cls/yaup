@@ -5,6 +5,10 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "yaup", "yaup\yaup.csproj", "{679C9D61-D41B-4E42-9498-7E82731DDA50}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "belote", "belote\belote.csproj", "{F791A22D-1816-4CAA-9277-2BB1A671D2C2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "test", "..\test\test.csproj", "{AC8FF338-9B0C-4155-B0C5-177CD5DFEB99}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +22,13 @@ Global
 		{679C9D61-D41B-4E42-9498-7E82731DDA50}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{679C9D61-D41B-4E42-9498-7E82731DDA50}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{679C9D61-D41B-4E42-9498-7E82731DDA50}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F791A22D-1816-4CAA-9277-2BB1A671D2C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F791A22D-1816-4CAA-9277-2BB1A671D2C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F791A22D-1816-4CAA-9277-2BB1A671D2C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F791A22D-1816-4CAA-9277-2BB1A671D2C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC8FF338-9B0C-4155-B0C5-177CD5DFEB99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC8FF338-9B0C-4155-B0C5-177CD5DFEB99}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC8FF338-9B0C-4155-B0C5-177CD5DFEB99}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC8FF338-9B0C-4155-B0C5-177CD5DFEB99}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
