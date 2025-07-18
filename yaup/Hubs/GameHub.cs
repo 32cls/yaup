@@ -23,9 +23,9 @@ namespace yaup.Hubs
             await GameService.StartGame(roomName, Clients);
         }
 
-        public async Task EvaluateCard(bool pick)
+        public async Task EvaluateCard(string roomName, bool picked)
         {
-            throw new NotImplementedException();
+            await GameService.EvaluateCard(roomName, picked, Context.UserIdentifier, Clients);
         }
     }
 }

@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 
 public class GameService : IGameService
@@ -46,7 +47,31 @@ public class GameService : IGameService
             player.DisplayHand();
         }
         await clients.Group(roomName).SendAsync("RevealedCard", game.Deck.Cards.First());
-        game.Starter = rng.Next(0, 5);
+    }
+
+    private async Task PickOrPass(Game game, IHubCallerClients clients)
+    {
+        await clients.User(game.Players.ElementAt(game.Starter).Id).SendAsync("PickOrPass");
+    }
+
+    public async Task EvaluateCard(string roomName, bool picked, string user, IHubCallerClients clients)
+    {
+        Games.TryGetValue(roomName, out Game game);
+        if (game == null || user != game.CurrentPlayer.Name)
+        {
+            throw new Exception();
+        }
+        if (picked)
+        {
+            var revealedCard = game.Deck.Cards.First();
+            game.CurrentPlayer.Hand.Add(revealedCard);
+            game.Deck.Cards.RemoveAt(0);
+        }
+        else
+        {
+            NextPlayer(game);
+            await PickOrPass(game, clients);
+        }
     }
 
     public async Task StartGame(string roomName, IHubCallerClients clients)
@@ -59,6 +84,8 @@ public class GameService : IGameService
         else
         {
             await DrawInitialCards(game, clients, roomName);
+            game.Starter = rng.Next(0, 5);
+            await PickOrPass(game, clients);
         }
     }
 
