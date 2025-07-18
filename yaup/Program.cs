@@ -1,12 +1,12 @@
 using yaup.Hubs;
 
-var builder = WebApplication.CreateSlimBuilder(args);
+const string CORS_OPTIONS = "_myAllowSpecificOrigins";
 
-var corsOptions = "_myAllowSpecificOrigins";
+var builder = WebApplication.CreateSlimBuilder(args);
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(name: corsOptions,
+    options.AddPolicy(name: CORS_OPTIONS,
                       policy =>
                       {
                           policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
@@ -18,6 +18,6 @@ builder.Services.AddSingleton<IGameService, GameService>();
 
 var app = builder.Build();
 
-app.UseCors(corsOptions);
+app.UseCors(CORS_OPTIONS);
 app.MapHub<GameHub>("/game");
 app.Run();

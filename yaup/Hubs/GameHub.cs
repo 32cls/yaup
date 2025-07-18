@@ -13,7 +13,7 @@ namespace yaup.Hubs
 
         public async Task JoinRoom(string roomName, string userName)
         {
-            GameService.JoinOrCreateGame(roomName, new Player(Context.UserIdentifier, userName));                
+            GameService.JoinOrCreateGame(roomName, new Player(Context.UserIdentifier, userName));
             await Groups.AddToGroupAsync(Context.ConnectionId, roomName);
             await Clients.Group(roomName).SendAsync("ReceiveMessage", roomName, userName);
         }
@@ -21,6 +21,11 @@ namespace yaup.Hubs
         public async Task StartGame(string roomName)
         {
             await GameService.StartGame(roomName, Clients);
+        }
+
+        public async Task EvaluateCard(bool pick)
+        {
+            throw new NotImplementedException();
         }
     }
 }

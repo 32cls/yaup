@@ -43,6 +43,11 @@
             <span id="cards"></span>
         </div>
     </div>
+    <div class="row p-1">
+        <div class="col-6">
+            <span>Revealed card: </span><span id="revealedCard"></span>
+        </div>
+    </div>
 </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js" integrity="sha512-7SRCYIJtR6F8ocwW7UxW6wGKqbSyqREDbfCORCbGLatU0iugBLwyOXpzhkPyHIFdBO0K2VCu57fvP2Twgx1o2A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
@@ -65,6 +70,10 @@
 
         connection.on("HandUpdate", function (cards) {
             document.getElementById("cards").textContent = cards.join(' / ');
+        });
+
+        connection.on("RevealedCard", function (card) {
+            document.getElementById("revealedCard").textContent = `${card.rank} of ${card.color}`;
         });
 
         connection.start().then(function () {
@@ -91,6 +100,10 @@
             });
             event.preventDefault();
         });
+
+
+
+        
 
     </script>
 </body>
