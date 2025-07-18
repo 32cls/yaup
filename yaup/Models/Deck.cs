@@ -1,6 +1,6 @@
 using System.Collections.Immutable;
 
-enum Colors
+public enum Colors
 {
     Spades,
     Hearts,
@@ -8,14 +8,14 @@ enum Colors
     Clubs
 }
 
-class Card(Colors Color, string Rank)
+public class Card(Colors Color, string Rank)
 {
     public Colors Color { get; } = Color;
     public string Rank { get; set; } = Rank;
 
 }
 
-class Deck
+public class Deck
 {
     private static readonly ImmutableArray<string> _ranks = ["7", "8", "9", "10", "J", "Q", "K", "A"];
 

@@ -12,12 +12,15 @@
         <div class="col-5"><input type="text" id="userInput" /></div>
     </div>
     <div class="row p-1">
-        <div class="col-1">Message</div>
-        <div class="col-5"><input type="text" class="w-100" id="messageInput" /></div>
+        <div class="col-1">Room name</div>
+        <div class="col-5"><input type="text" class="w-100" id="roomInput" /></div>
     </div>
     <div class="row p-1">
         <div class="col-6 text-end">
-            <input type="button" id="sendButton" value="Send Message" />
+            <input type="button" id="joinButton" value="Join" />
+        </div>
+        <div class="col-6 text-end">
+            <input type="button" id="startButton" value="Start" />
         </div>
     </div>
     <div class="row p-1">
@@ -30,6 +33,16 @@
             <ul id="messagesList"></ul>
         </div>
     </div>
+    <div class="row p-1">
+        <div class="col-6">
+            <hr />
+        </div>
+    </div>
+    <div class="row p-1">
+        <div class="col-6">
+            <span id="cards"></span>
+        </div>
+    </div>
 </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js" integrity="sha512-7SRCYIJtR6F8ocwW7UxW6wGKqbSyqREDbfCORCbGLatU0iugBLwyOXpzhkPyHIFdBO0K2VCu57fvP2Twgx1o2A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
@@ -38,7 +51,8 @@
         var connection = new signalR.HubConnectionBuilder().withUrl("http://localhost:5042/game", {withCredentials: false}).build();
 
         //Disable the send button until connection is established.
-        document.getElementById("sendButton").disabled = true;
+        document.getElementById("joinButton").disabled = true;
+        document.getElementById("startButton").disabled = true;
 
         connection.on("ReceiveMessage", function (roomName, userName) {
             var li = document.createElement("li");
@@ -49,20 +63,35 @@
             li.textContent = `${userName} joined ${roomName}`;
         });
 
+        connection.on("HandUpdate", function (cards) {
+            document.getElementById("cards").textContent = cards.join(' / ');
+        });
+
         connection.start().then(function () {
-            document.getElementById("sendButton").disabled = false;
+            document.getElementById("joinButton").disabled = false;
+            document.getElementById("startButton").disabled = false;
         }).catch(function (err) {
             return console.error(err.toString());
         });
 
-        document.getElementById("sendButton").addEventListener("click", function (event) {
+        document.getElementById("joinButton").addEventListener("click", function (event) {
             var user = document.getElementById("userInput").value;
-            var message = document.getElementById("messageInput").value;
-            connection.invoke("SendMessage", user.toString(), message.toString()).catch(function (err) {
+            var room = document.getElementById("roomInput").value;
+            connection.invoke("JoinRoom", room, user).catch(function (err) {
                 return console.error(err.toString());
             });
             event.preventDefault();
         });
+
+        document.getElementById("startButton").addEventListener("click", function (event) {
+            var user = document.getElementById("userInput").value;
+            var room = document.getElementById("roomInput").value;
+            connection.invoke("StartGame", room).catch(function (err) {
+                return console.error(err.toString());
+            });
+            event.preventDefault();
+        });
+
     </script>
 </body>
 </html>

@@ -4,24 +4,23 @@ namespace yaup.Hubs
 {
     public class GameHub : Hub
     {
-        private readonly IGameController _gameController;
+        public readonly IGameService GameService;
 
-        public GameHub(IGameController gameController)
+        public GameHub(IGameService gameService)
         {
-            _gameController = gameController;
+            GameService = gameService;
         }
 
         public async Task JoinRoom(string roomName, string userName)
         {
-            _gameController.JoinOrCreateGame(roomName, new Player(Context.UserIdentifier, userName));                
+            GameService.JoinOrCreateGame(roomName, new Player(Context.UserIdentifier, userName));                
             await Groups.AddToGroupAsync(Context.ConnectionId, roomName);
             await Clients.Group(roomName).SendAsync("ReceiveMessage", roomName, userName);
         }
 
         public async Task StartGame(string roomName)
         {
-            _gameController.StartGame(roomName);
-            await Clients.Group(roomName).SendAsync("ReceiveMessage", roomName);
+            await GameService.StartGame(roomName, Clients);
         }
     }
 }

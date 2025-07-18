@@ -1,10 +1,12 @@
-class GameController: IGameController
+using Microsoft.AspNetCore.SignalR;
+
+public class GameService: IGameService
 {
     private static readonly Random rng = new();
 
     public Dictionary<string, Game> Games { get; } = [];
 
-    void IGameController.JoinOrCreateGame(string roomName, Player player)
+    public void JoinOrCreateGame(string roomName, Player player)
     {
         Games.TryGetValue(roomName, out Game game);
         if (game != null)
@@ -28,30 +30,33 @@ class GameController: IGameController
         game.Deck.Display();
     }
 
-    private void DrawInitialCards(Game game)
+    private async Task DrawInitialCards(Game game, IHubCallerClients clients)
     {
         foreach (var player in game.Players)
         {
             player.Hand.AddRange(game.Deck.Cards.GetRange(0, 3));
+            await clients.User(player.Id).SendAsync("HandUpdate", player.Hand);
             game.Deck.Cards.RemoveRange(0, 3);
         }
         foreach (var player in game.Players)
         {
             player.Hand.AddRange(game.Deck.Cards.GetRange(0, 2));
+            await clients.User(player.Id).SendAsync("HandUpdate", player.Hand);
             game.Deck.Cards.RemoveRange(0, 2);
             player.DisplayHand();
         }
     }
 
-    public void StartGame(string roomName)
+    public async Task StartGame(string roomName, IHubCallerClients clients)
     {
         Games.TryGetValue(roomName, out Game game);
-        if (game == null)
+        if (game == null || game.Players.Count != 4)
         {
             throw new Exception();
         }
         else {
-            DrawInitialCards(game);
+            await DrawInitialCards(game, clients);
         }        
     }
+
 }
