@@ -7,4 +7,9 @@ public class Trick
     {
 
     }
+
+    public void Start()
+    {
+        
+    }
 }

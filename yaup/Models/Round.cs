@@ -27,9 +27,12 @@ public class Round
 
     public async Task Start()
     {
-        await DrawInitialCards();
-        await PickOrPass();
-        
+        while (!RevealedCardPicked)
+        {
+            await DrawInitialCards();
+            await PickOrPass();
+        }
+
     }
 
     private async Task DrawInitialCards()
@@ -67,15 +70,20 @@ public class Round
         }
         if (picked)
         {
+            var topCard = Game.Deck.Cards.First();
             if (TurnCounter == 1)
             {
-                TrumpColor = Game.Deck.Cards.First().Color;
+                TrumpColor = topCard.Color;
+                CurrentPlayer.Hand.Add(topCard);
             }
             else if (TurnCounter == 2)
             {
                 if (trumpColor != null && trumpColor.Value != Game.Deck.Cards.First().Color)
                 {
                     TrumpColor = trumpColor.Value;
+                    CurrentPlayer.Hand.Add(topCard);
+                    await DrawRemainingCards();
+                    StartTricks();
                 }
                 else
                 {
@@ -89,7 +97,36 @@ public class Round
             await PickOrPass();
         }
     }
-    
-    
+
+    private async Task DrawRemainingCards()
+    {
+        foreach (var player in Game.Players)
+        {
+            if (player.Id == CurrentPlayer.Id)
+            {
+                player.Hand.AddRange(Game.Deck.Cards.GetRange(0, 2));
+                Game.Deck.Cards.RemoveRange(0, 2);
+            }
+            else
+            {
+                player.Hand.AddRange(Game.Deck.Cards.GetRange(0, 3));
+                Game.Deck.Cards.RemoveRange(0, 3);
+            }
+            player.DisplayHand();            
+            await Game.Clients.User(player.Id).SendAsync("HandUpdate", player.Hand);
+        }
+    }
+
+    private void StartTricks()
+    {
+        for (var i = 0; i < 8; i++)
+        {
+            var trick = new Trick();
+            trick.Start();
+            Tricks.Add(trick);
+        }
+    }
+
+
 
 }
