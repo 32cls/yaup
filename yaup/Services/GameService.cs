@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 
 public class GameService : IGameService
@@ -31,49 +30,6 @@ public class GameService : IGameService
         game.Deck.Display();
     }
 
-    private async Task DrawInitialCards(Game game, IHubCallerClients clients, string roomName)
-    {
-        foreach (var player in game.Players)
-        {
-            player.Hand.AddRange(game.Deck.Cards.GetRange(0, 3));
-            await clients.User(player.Id).SendAsync("HandUpdate", player.Hand);
-            game.Deck.Cards.RemoveRange(0, 3);
-        }
-        foreach (var player in game.Players)
-        {
-            player.Hand.AddRange(game.Deck.Cards.GetRange(0, 2));
-            await clients.User(player.Id).SendAsync("HandUpdate", player.Hand);
-            game.Deck.Cards.RemoveRange(0, 2);
-            player.DisplayHand();
-        }
-        await clients.Group(roomName).SendAsync("RevealedCard", game.Deck.Cards.First());
-    }
-
-    private async Task PickOrPass(Game game, IHubCallerClients clients)
-    {
-        await clients.User(game.Players.ElementAt(game.Starter).Id).SendAsync("PickOrPass");
-    }
-
-    public async Task EvaluateCard(string roomName, bool picked, string user, IHubCallerClients clients)
-    {
-        Games.TryGetValue(roomName, out Game game);
-        if (game == null || user != game.CurrentPlayer.Name)
-        {
-            throw new Exception();
-        }
-        if (picked)
-        {
-            var revealedCard = game.Deck.Cards.First();
-            game.CurrentPlayer.Hand.Add(revealedCard);
-            game.Deck.Cards.RemoveAt(0);
-        }
-        else
-        {
-            NextPlayer(game);
-            await PickOrPass(game, clients);
-        }
-    }
-
     public async Task StartGame(string roomName, IHubCallerClients clients)
     {
         Games.TryGetValue(roomName, out Game game);
@@ -83,15 +39,29 @@ public class GameService : IGameService
         }
         else
         {
-            await DrawInitialCards(game, clients, roomName);
-            game.Starter = rng.Next(0, 5);
-            await PickOrPass(game, clients);
+            game.RoomName = roomName;
+            game.Clients = clients;
+            while (game.BlueTeamScore < 1000 || game.RedTeamScore < 1000)
+            {
+                var round = new Round(game);
+                game.Rounds.Add(round);
+                await round.Start();
+            }
         }
     }
 
-    private void NextPlayer(Game game)
+    public async Task EvaluateCard(string roomName, bool picked, Colors? trumpColor, string user, IHubCallerClients clients)
     {
-        game.Starter = (game.Starter + 1) % 4; 
+        Games.TryGetValue(roomName, out Game game);
+        if (game == null)
+        {
+            throw new Exception();
+        }
+        var currentRound = game.Rounds.Last();
+        if (currentRound.CurrentPlayer.Id != user)
+        {
+            throw new Exception();
+        }
+        await currentRound.PlayerAnswer(picked, trumpColor);        
     }
-
 }

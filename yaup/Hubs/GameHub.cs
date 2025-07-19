@@ -23,9 +23,9 @@ namespace yaup.Hubs
             await GameService.StartGame(roomName, Clients);
         }
 
-        public async Task EvaluateCard(string roomName, bool picked)
+        public async Task EvaluateCard(string roomName, bool picked, Colors? trumpColor)
         {
-            await GameService.EvaluateCard(roomName, picked, Context.UserIdentifier, Clients);
+            await GameService.EvaluateCard(roomName, picked, trumpColor, Context.UserIdentifier, Clients);
         }
     }
 }

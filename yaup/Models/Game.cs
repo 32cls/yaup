@@ -1,10 +1,18 @@
+using Microsoft.AspNetCore.SignalR;
+
 public class Game
 {
     public SortedSet<Player> Players = [];
     public Deck Deck = new Deck();
-    public int Starter;
+    public List<Round> Rounds = [];
 
-    public Player CurrentPlayer;
+    public int RedTeamScore;
+
+    public int BlueTeamScore;
+
+    public IHubCallerClients Clients;
+
+    public string RoomName;
 
     public Game()
     {
