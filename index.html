@@ -53,7 +53,12 @@
     <script>
         "use strict";
 
-        var connection = new signalR.HubConnectionBuilder().withUrl("http://localhost:5042/game", {withCredentials: false}).build();
+        var connection = new signalR.HubConnectionBuilder()
+            .withUrl("http://localhost:5042/game", {
+                withCredentials: false, 
+                accessTokenFactory: () => this.loginToken
+            })
+            .build();
 
         //Disable the send button until connection is established.
         document.getElementById("joinButton").disabled = true;

@@ -26,8 +26,6 @@ public class GameService : IGameService
             game.Players.Add(player);
             Games.Add(roomName, game);
         }
-        game.Deck.Cards = [.. game.Deck.Cards.OrderBy(_ => rng.Next())];
-        game.Deck.Display();
     }
 
     public async Task StartGame(string roomName, IHubCallerClients clients)
@@ -39,6 +37,9 @@ public class GameService : IGameService
         }
         else
         {
+            game.Deck = new Deck();
+            game.Deck.Cards = [.. game.Deck.Cards.OrderBy(_ => rng.Next())];
+            game.Deck.Display();
             game.RoomName = roomName;
             game.Clients = clients;
             while (game.BlueTeamScore < 1000 || game.RedTeamScore < 1000)

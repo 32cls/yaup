@@ -2,8 +2,8 @@ using Microsoft.AspNetCore.SignalR;
 
 public class Game
 {
-    public SortedSet<Player> Players = [];
-    public Deck Deck = new Deck();
+    public HashSet<Player> Players = [];
+    public Deck Deck;
     public List<Round> Rounds = [];
 
     public int RedTeamScore;

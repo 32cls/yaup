@@ -121,7 +121,7 @@ public class Round
     {
         for (var i = 0; i < 8; i++)
         {
-            var trick = new Trick();
+            var trick = new Trick(CurrentPlayer, TrumpColor);
             trick.Start();
             Tricks.Add(trick);
         }
