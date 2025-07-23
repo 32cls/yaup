@@ -13,7 +13,8 @@ namespace yaup.Hubs
 
         public async Task JoinRoom(string roomName, string userName)
         {
-            GameService.JoinOrCreateGame(roomName, new Player(Context.UserIdentifier, userName));
+            var player = new Player(Context.ConnectionId, userName);
+            GameService.JoinOrCreateGame(roomName, player);
             await Groups.AddToGroupAsync(Context.ConnectionId, roomName);
             await Clients.Group(roomName).SendAsync("ReceiveMessage", roomName, userName);
         }
@@ -23,9 +24,9 @@ namespace yaup.Hubs
             await GameService.StartGame(roomName, Clients);
         }
 
-        public async Task EvaluateCard(string roomName, bool picked, Colors? trumpColor)
+        public async Task EvaluateCard(string userName, string roomName, bool picked, Colors? trumpColor)
         {
-            await GameService.EvaluateCard(roomName, picked, trumpColor, Context.UserIdentifier, Clients);
+            await GameService.EvaluateCard(roomName, picked, trumpColor, userName, Clients);
         }
     }
 }

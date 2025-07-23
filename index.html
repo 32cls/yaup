@@ -74,7 +74,10 @@
         });
 
         connection.on("HandUpdate", function (cards) {
-            document.getElementById("cards").textContent = cards.join(' / ');
+            document.getElementById("cards").textContent = '';
+            cards.forEach(card => {
+                document.getElementById("cards").textContent += `${card.rank} of ${card.color} /`
+            });
         });
 
         connection.on("RevealedCard", function (card) {

@@ -1,4 +1,6 @@
 using System.Collections.Immutable;
+using System.Text.Json.Serialization;
+
 
 public enum Colors
 {
@@ -10,6 +12,7 @@ public enum Colors
 
 public class Card(Colors Color, string Rank)
 {
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public Colors Color { get; } = Color;
     public string Rank { get; set; } = Rank;
 

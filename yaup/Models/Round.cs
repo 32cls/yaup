@@ -27,12 +27,8 @@ public class Round
 
     public async Task Start()
     {
-        while (!RevealedCardPicked)
-        {
-            await DrawInitialCards();
-            await PickOrPass();
-        }
-
+        await DrawInitialCards();
+        await PickOrPass();
     }
 
     private async Task DrawInitialCards()
@@ -40,13 +36,13 @@ public class Round
         foreach (var player in Game.Players)
         {
             player.Hand.AddRange(Game.Deck.Cards.GetRange(0, 3));
-            await Game.Clients.User(player.Id).SendAsync("HandUpdate", player.Hand);
+            await Game.Clients.User(player.ConnectionId).SendAsync("HandUpdate", player.Hand);
             Game.Deck.Cards.RemoveRange(0, 3);
         }
         foreach (var player in Game.Players)
         {
             player.Hand.AddRange(Game.Deck.Cards.GetRange(0, 2));
-            await Game.Clients.User(player.Id).SendAsync("HandUpdate", player.Hand);
+            await Game.Clients.User(player.ConnectionId).SendAsync("HandUpdate", player.Hand);
             Game.Deck.Cards.RemoveRange(0, 2);
             player.DisplayHand();
         }
@@ -55,16 +51,17 @@ public class Round
 
     public async Task PickOrPass()
     {
-        await Game.Clients.User(CurrentPlayer.Id).SendAsync("PickOrPass");
+        await Game.Clients.User(CurrentPlayer.ConnectionId).SendAsync("PickOrPass");
     }
 
     public async Task PlayerAnswer(bool picked, Colors? trumpColor)
     {
-        if (CurrentPlayer.Id == Game.Players.ElementAt(StarterIndex).Id)
+        if (CurrentPlayer.ConnectionId == Game.Players.ElementAt(StarterIndex).ConnectionId)
         {
             TurnCounter++;
             if (TurnCounter == 3)
             {
+                
                 return;
             }
         }
@@ -102,7 +99,7 @@ public class Round
     {
         foreach (var player in Game.Players)
         {
-            if (player.Id == CurrentPlayer.Id)
+            if (player.ConnectionId == CurrentPlayer.ConnectionId)
             {
                 player.Hand.AddRange(Game.Deck.Cards.GetRange(0, 2));
                 Game.Deck.Cards.RemoveRange(0, 2);
@@ -113,7 +110,7 @@ public class Round
                 Game.Deck.Cards.RemoveRange(0, 3);
             }
             player.DisplayHand();            
-            await Game.Clients.User(player.Id).SendAsync("HandUpdate", player.Hand);
+            await Game.Clients.User(player.ConnectionId).SendAsync("HandUpdate", player.Hand);
         }
     }
 
@@ -126,7 +123,5 @@ public class Round
             Tricks.Add(trick);
         }
     }
-
-
 
 }

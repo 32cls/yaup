@@ -42,12 +42,9 @@ public class GameService : IGameService
             game.Deck.Display();
             game.RoomName = roomName;
             game.Clients = clients;
-            while (game.BlueTeamScore < 1000 || game.RedTeamScore < 1000)
-            {
-                var round = new Round(game);
-                game.Rounds.Add(round);
-                await round.Start();
-            }
+            var round = new Round(game);
+            game.Rounds.Add(round);
+            await round.Start();
         }
     }
 
@@ -59,7 +56,7 @@ public class GameService : IGameService
             throw new Exception();
         }
         var currentRound = game.Rounds.Last();
-        if (currentRound.CurrentPlayer.Id != user)
+        if (currentRound.CurrentPlayer.Name != user)
         {
             throw new Exception();
         }
