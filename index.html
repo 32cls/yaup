@@ -8,6 +8,19 @@
 <body>
     <div class="container">
     <div class="row p-1">
+        <div class="col-1">email</div>
+        <div class="col-5"><input type="email" id="emailInput" /></div>
+    </div>
+    <div class="row p-1">
+        <div class="col-1">password</div>
+        <div class="col-5"><input type="password" class="w-100" id="passwordInput" /></div>
+    </div>
+    <div class="row p-1">
+        <div class="col-6 text-end">
+            <input type="button" id="loginButton" value="Login" />
+        </div>
+    </div>
+    <div class="row p-1">
         <div class="col-1">User</div>
         <div class="col-5"><input type="text" id="userInput" /></div>
     </div>
@@ -52,11 +65,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js" integrity="sha512-7SRCYIJtR6F8ocwW7UxW6wGKqbSyqREDbfCORCbGLatU0iugBLwyOXpzhkPyHIFdBO0K2VCu57fvP2Twgx1o2A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
         "use strict";
-
+        
         var connection = new signalR.HubConnectionBuilder()
             .withUrl("http://localhost:5042/game", {
-                withCredentials: false, 
-                accessTokenFactory: () => this.loginToken
+                withCredentials: true,
             })
             .build();
 
@@ -90,6 +102,24 @@
         }).catch(function (err) {
             return console.error(err.toString());
         });
+        
+        document.getElementById("loginButton").addEventListener("click", function(event) {
+            var email = document.getElementById("emailInput").value;
+            var password = document.getElementById("passwordInput").value;
+            fetch("http://localhost:5042/login?useCookies=true", {
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                method: "POST",
+                body: JSON.stringify({
+                    "email": email,
+                    "password": password
+                }),
+                credentials: "include"
+            }).then((res) => {
+                console.log(res.status)
+            })
+        });
 
         document.getElementById("joinButton").addEventListener("click", function (event) {
             var user = document.getElementById("userInput").value;
@@ -107,11 +137,7 @@
                 return console.error(err.toString());
             });
             event.preventDefault();
-        });
-
-
-
-        
+        });        
 
     </script>
 </body>

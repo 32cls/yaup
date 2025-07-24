@@ -8,3 +8,5 @@ services:
       POSTGRES_PASSWORD: myPassword
       POSTGRES_USER: yaup
       POSTGRES_DB: yaup
+    ports:
+    - 5432:5432

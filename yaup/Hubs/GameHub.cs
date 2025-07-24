@@ -1,7 +1,9 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace yaup.Hubs
 {
+    [Authorize]
     public class GameHub : Hub
     {
         public readonly IGameService GameService;
@@ -13,7 +15,7 @@ namespace yaup.Hubs
 
         public async Task JoinRoom(string roomName, string userName)
         {
-            var player = new Player(Context.ConnectionId, userName);
+            var player = new Player(Context.UserIdentifier, userName);
             GameService.JoinOrCreateGame(roomName, player);
             await Groups.AddToGroupAsync(Context.ConnectionId, roomName);
             await Clients.Group(roomName).SendAsync("ReceiveMessage", roomName, userName);
