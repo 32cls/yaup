@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div class="container">
+    <div class="row p-1">
+        <div class="col-1">email</div>
+        <div class="col-5"><input type="email" id="emailInput" /></div>
+    </div>
+    <div class="row p-1">
+        <div class="col-1">password</div>
+        <div class="col-5"><input type="password" class="w-100" id="passwordInput" /></div>
+    </div>
+    <div class="row p-1">
+        <div class="col-6 text-end">
+            <input type="button" id="loginButton" value="Login" />
+        </div>
+    </div>
+    <div class="row p-1">
+        <div class="col-1">Room name</div>
+        <div class="col-5"><input type="text" class="w-100" id="roomInput" /></div>
+    </div>
+    <div class="row p-1">
+        <div class="col-6 text-end">
+            <input type="button" id="joinButton" value="Join" />
+        </div>
+        <div class="col-6 text-end">
+            <input type="button" id="startButton" value="Start" />
+        </div>
+    </div>
+    <div class="row p-1">
+        <div class="col-6">
+            <hr />
+        </div>
+    </div>
+    <div class="row p-1">
+        <div class="col-6">
+            <ul id="messagesList"></ul>
+        </div>
+    </div>
+    <div class="row p-1">
+        <div class="col-6">
+            <hr />
+        </div>
+    </div>
+    <div class="row p-1">
+        <div class="col-6">
+            <span id="cards"></span>
+        </div>
+    </div>
+    <div class="row p-1">
+        <div class="col-6">
+            <span>Revealed card: </span><span id="revealedCard"></span>
+        </div>
+        <div class="col-6">
+            <span id="pickOrPass"></span>
+        </div>
+        <div class="col-6 text-end">
+            <input type="button" id="pickButton" value="Pick" />
+        </div>
+        <div class="col-6 text-end">
+            <input type="button" id="passButton" value="Pass" />
+        </div>
+    </div>
+</div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js" integrity="sha512-7SRCYIJtR6F8ocwW7UxW6wGKqbSyqREDbfCORCbGLatU0iugBLwyOXpzhkPyHIFdBO0K2VCu57fvP2Twgx1o2A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        "use strict";
+        
+        //Disable the send button until connection is established.
+        document.getElementById("joinButton").disabled = true;
+        document.getElementById("startButton").disabled = true;
+        document.getElementById("pickButton").disabled = true;
+        document.getElementById("passButton").disabled = true;
+        
+        document.getElementById("loginButton").addEventListener("click", function(event) {
+            var email = document.getElementById("emailInput").value;
+            var password = document.getElementById("passwordInput").value;
+            fetch("http://localhost:5042/login?useCookies=true", {
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                method: "POST",
+                body: JSON.stringify({
+                    "email": email,
+                    "password": password
+                }),
+                credentials: "include"
+            }).then((res) => {
+                console.log(res.status)
+                var connection = new signalR.HubConnectionBuilder()
+                .withUrl("http://localhost:5042/game", {
+                    withCredentials: true,
+                })
+                .build();
+                connection.on("ReceiveMessage", function (roomName, userName) {
+                    var li = document.createElement("li");
+                    document.getElementById("messagesList").appendChild(li);
+                    // We can assign user-supplied strings to an element's textContent because it
+                    // is not interpreted as markup. If you're assigning in any other way, you 
+                    // should be aware of possible script injection concerns.
+                    li.textContent = `${userName} joined ${roomName}`;
+                });
+        
+                connection.on("HandUpdate", function (cards) {
+                    document.getElementById("cards").textContent = '';
+                    cards.forEach(card => {
+                        document.getElementById("cards").textContent += `${card.rank} of ${card.color} /`
+                    });
+                });
+        
+                connection.on("RevealedCard", function (card) {
+                    document.getElementById("revealedCard").textContent = `${card.rank} of ${card.color}`;
+                    document.getElementById("pickButton").disabled = false;
+                    document.getElementById("passButton").disabled = false;
+                });
+                
+                connection.on("PickOrPass", function() {
+                    document.getElementById("pickOrPass").textContent = "It's your turn to talk!";
+                });
+
+                connection.start().then(function () {
+                    document.getElementById("joinButton").disabled = false;
+                    document.getElementById("startButton").disabled = false;
+                }).catch(function (err) {
+                    return console.error(err.toString());
+                });
+
+                document.getElementById("joinButton").addEventListener("click", function (event) {
+                    var room = document.getElementById("roomInput").value;
+                    connection.invoke("JoinRoom", room).catch(function (err) {
+                        return console.error(err.toString());
+                    });
+                    event.preventDefault();
+                });
+        
+                document.getElementById("startButton").addEventListener("click", function (event) {
+                    var room = document.getElementById("roomInput").value;
+                    connection.invoke("StartGame", room).catch(function (err) {
+                        return console.error(err.toString());
+                    });
+                    event.preventDefault();
+                });
+                
+                document.getElementById("pickButton").addEventListener("click", function (event) {
+                    var room = document.getElementById("roomInput").value;
+                    connection.invoke("EvaluateCard", room, true, null).catch(function (err) {
+                        return console.error(err.toString());
+                    });
+                    event.preventDefault();
+                });
+
+                document.getElementById("passButton").addEventListener("click", function (event) {
+                    var room = document.getElementById("roomInput").value;
+                    connection.invoke("EvaluateCard", room, false, null).catch(function (err) {
+                        return console.error(err.toString());
+                    });
+                    event.preventDefault();
+                });
+            })
+        });
+
+
+    </script>
+</body>
+</html>

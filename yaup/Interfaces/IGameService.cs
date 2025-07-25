@@ -6,7 +6,7 @@ public interface IGameService
 
     public void JoinOrCreateGame(string roomName, Player player);
 
-    public Task EvaluateCard(string roomName, bool picked, Colors? trumpColor, string user, IHubCallerClients clients);
+    public Task EvaluateCard(string roomName, bool picked, Colors? trumpColor, string userId, IHubCallerClients clients);
 
     public Task StartGame(string roomName, IHubCallerClients clients);
     

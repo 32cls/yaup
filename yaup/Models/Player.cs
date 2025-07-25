@@ -1,6 +1,6 @@
 public class Player(string id, string name)
 {
-    public string ConnectionId { get; set; } = id;
+    public string Id { get; set; } = id;
     public string Name { get; set; } = name;
     public List<Card> Hand { get; } = [];
 

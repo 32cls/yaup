@@ -48,7 +48,7 @@ public class GameService : IGameService
         }
     }
 
-    public async Task EvaluateCard(string roomName, bool picked, Colors? trumpColor, string user, IHubCallerClients clients)
+    public async Task EvaluateCard(string roomName, bool picked, Colors? trumpColor, string userId, IHubCallerClients clients)
     {
         Games.TryGetValue(roomName, out Game game);
         if (game == null)
@@ -56,7 +56,7 @@ public class GameService : IGameService
             throw new Exception();
         }
         var currentRound = game.Rounds.Last();
-        if (currentRound.CurrentPlayer.Name != user)
+        if (currentRound.CurrentPlayer.Id != userId)
         {
             throw new Exception();
         }

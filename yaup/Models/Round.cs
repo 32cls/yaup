@@ -36,13 +36,13 @@ public class Round
         foreach (var player in Game.Players)
         {
             player.Hand.AddRange(Game.Deck.Cards.GetRange(0, 3));
-            await Game.Clients.User(player.ConnectionId).SendAsync("HandUpdate", player.Hand);
+            await Game.Clients.User(player.Id).SendAsync("HandUpdate", player.Hand);
             Game.Deck.Cards.RemoveRange(0, 3);
         }
         foreach (var player in Game.Players)
         {
             player.Hand.AddRange(Game.Deck.Cards.GetRange(0, 2));
-            await Game.Clients.User(player.ConnectionId).SendAsync("HandUpdate", player.Hand);
+            await Game.Clients.User(player.Id).SendAsync("HandUpdate", player.Hand);
             Game.Deck.Cards.RemoveRange(0, 2);
             player.DisplayHand();
         }
@@ -51,12 +51,12 @@ public class Round
 
     public async Task PickOrPass()
     {
-        await Game.Clients.User(CurrentPlayer.ConnectionId).SendAsync("PickOrPass");
+        await Game.Clients.User(CurrentPlayer.Id).SendAsync("PickOrPass");
     }
 
     public async Task PlayerAnswer(bool picked, Colors? trumpColor)
     {
-        if (CurrentPlayer.ConnectionId == Game.Players.ElementAt(StarterIndex).ConnectionId)
+        if (CurrentPlayer.Id == Game.Players.ElementAt(StarterIndex).Id)
         {
             TurnCounter++;
             if (TurnCounter == 3)
@@ -90,7 +90,7 @@ public class Round
         }
         else
         {
-            CurrentPlayer = Game.Players.ElementAt(StarterIndex + 1 % 4);
+            CurrentPlayer = Game.Players.ElementAt((StarterIndex + 1) % 4);
             await PickOrPass();
         }
     }
@@ -99,7 +99,7 @@ public class Round
     {
         foreach (var player in Game.Players)
         {
-            if (player.ConnectionId == CurrentPlayer.ConnectionId)
+            if (player.Id == CurrentPlayer.Id)
             {
                 player.Hand.AddRange(Game.Deck.Cards.GetRange(0, 2));
                 Game.Deck.Cards.RemoveRange(0, 2);
@@ -110,7 +110,7 @@ public class Round
                 Game.Deck.Cards.RemoveRange(0, 3);
             }
             player.DisplayHand();            
-            await Game.Clients.User(player.ConnectionId).SendAsync("HandUpdate", player.Hand);
+            await Game.Clients.User(player.Id).SendAsync("HandUpdate", player.Hand);
         }
     }
 
