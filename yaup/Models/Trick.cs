@@ -34,6 +34,7 @@ public class Trick(Player master, Colors trumpColor, int playerIndex, HashSet<Pl
                 PlayedCards.Append(card);
             }
         }
+        Players.ElementAt(PlayerIndex).Hand.Remove(card);
         PlayerIndex = (PlayerIndex + 1) % 4;
     }
 

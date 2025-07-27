@@ -60,7 +60,7 @@ public class GameService : IGameService
         {
             throw new Exception();
         }
-        await currentRound.PlayerAnswer(picked, trumpColor);        
+        await currentRound.PlayerAnswer(picked, trumpColor);
     }
 
     public async Task PlayCard(string roomName, string userId, Card card)
@@ -73,4 +73,5 @@ public class GameService : IGameService
         var currentTrick = game.Rounds.Last().Tricks.Last();
         await currentTrick.PlayCard(card, userId);
     }
+
 }

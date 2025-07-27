@@ -9,5 +9,5 @@ public interface IGameService
     public Task EvaluateCard(string roomName, bool picked, Colors? trumpColor, string userId, IHubCallerClients clients);
 
     public Task StartGame(string roomName, IHubCallerClients clients);
-    public Task PlayCard(string roomName, Card card);
+    public Task PlayCard(string roomName, string userId, Card card);
 }

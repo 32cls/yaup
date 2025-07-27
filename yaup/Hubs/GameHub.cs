@@ -33,7 +33,7 @@ namespace yaup.Hubs
 
         public async Task PlayCard(string roomName, Card card)
         {
-            await GameService.PlayCard(roomName, card);
+            await GameService.PlayCard(roomName, Context.UserIdentifier, card);
         }
     }
 }

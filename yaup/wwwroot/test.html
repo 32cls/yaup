@@ -66,6 +66,20 @@
             <input type="button" id="passButton" value="Pass" />
         </div>
     </div>
+    <div class="row p-1">
+        <div class="col-6">
+            <hr />
+        </div>
+    </div>
+    <div class="row p-1">
+        <div class="col-6">
+            <label for="cardsSelect">Play a card:</label>
+            <select name="cardsSelect" id="cardsSelect"></select>
+        </div>
+        <div class="col-6 text-end">
+            <input type="button" id="playButton" value="Play Card" />
+        </div>
+    </div>
 </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js" integrity="sha512-7SRCYIJtR6F8ocwW7UxW6wGKqbSyqREDbfCORCbGLatU0iugBLwyOXpzhkPyHIFdBO0K2VCu57fvP2Twgx1o2A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
@@ -105,11 +119,17 @@
                     // should be aware of possible script injection concerns.
                     li.textContent = `${userName} joined ${roomName}`;
                 });
-        
+                
                 connection.on("HandUpdate", function (cards) {
                     document.getElementById("cards").textContent = '';
+                    var select = document.getElementById("cardsSelect");
+                    select.innerHTML = '';
                     cards.forEach(card => {
+                        var option = document.createElement("option")
                         document.getElementById("cards").textContent += `${card.rank} of ${card.color} /`
+                        document.getElementById("cardsSelect").appendChild(option)
+                        option.textContent = `${card.rank} of ${card.color}`
+                        option.value = card;
                     });
                 });
         
@@ -157,6 +177,14 @@
                 document.getElementById("passButton").addEventListener("click", function (event) {
                     var room = document.getElementById("roomInput").value;
                     connection.invoke("EvaluateCard", room, false, null).catch(function (err) {
+                        return console.error(err.toString());
+                    });
+                    event.preventDefault();
+                });
+
+                document.getElementById("playButton").addEventListener("click", function (event) {
+                    var room = document.getElementById("roomInput").value;
+                    connection.invoke("PlayCard", room, ).catch(function (err) {
                         return console.error(err.toString());
                     });
                     event.preventDefault();
