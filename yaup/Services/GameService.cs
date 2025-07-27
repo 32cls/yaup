@@ -56,10 +56,21 @@ public class GameService : IGameService
             throw new Exception();
         }
         var currentRound = game.Rounds.Last();
-        if (currentRound.CurrentPlayer.Id != userId)
+        if (currentRound.Game.Players.ElementAt(currentRound.CurrentIndex).Id != userId)
         {
             throw new Exception();
         }
         await currentRound.PlayerAnswer(picked, trumpColor);        
+    }
+
+    public async Task PlayCard(string roomName, string userId, Card card)
+    {
+        Games.TryGetValue(roomName, out Game game);
+        if (game == null)
+        {
+            throw new Exception();
+        }
+        var currentTrick = game.Rounds.Last().Tricks.Last();
+        await currentTrick.PlayCard(card, userId);
     }
 }

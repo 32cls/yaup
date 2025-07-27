@@ -120,7 +120,7 @@
                 });
                 
                 connection.on("PickOrPass", function() {
-                    document.getElementById("pickOrPass").textContent = "It's your turn to talk!";
+                    document.getElementById("pickOrPass").textContent += "It's your turn to talk!\n";
                 });
 
                 connection.start().then(function () {

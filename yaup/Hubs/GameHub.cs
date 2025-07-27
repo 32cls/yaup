@@ -30,5 +30,10 @@ namespace yaup.Hubs
         {
             await GameService.EvaluateCard(roomName, picked, trumpColor, Context.UserIdentifier, Clients);
         }
+
+        public async Task PlayCard(string roomName, Card card)
+        {
+            await GameService.PlayCard(roomName, card);
+        }
     }
 }

@@ -5,7 +5,7 @@ public class Round
     private static readonly Random rng = new();
     public int StarterIndex;
 
-    public Player CurrentPlayer;
+    public int CurrentIndex;
 
     public List<Trick> Tricks = [];
 
@@ -21,7 +21,7 @@ public class Round
     {
         Game = game;
         StarterIndex = rng.Next(0, 4);
-        CurrentPlayer = Game.Players.ElementAt(StarterIndex);
+        CurrentIndex = StarterIndex;
         TurnCounter = 0;
     }
 
@@ -51,12 +51,12 @@ public class Round
 
     public async Task PickOrPass()
     {
-        await Game.Clients.User(CurrentPlayer.Id).SendAsync("PickOrPass");
+        await Game.Clients.User(Game.Players.ElementAt(CurrentIndex).Id).SendAsync("PickOrPass");
     }
 
     public async Task PlayerAnswer(bool picked, Colors? trumpColor)
     {
-        if (CurrentPlayer.Id == Game.Players.ElementAt(StarterIndex).Id)
+        if (Game.Players.ElementAt(CurrentIndex).Id == Game.Players.ElementAt(StarterIndex).Id)
         {
             TurnCounter++;
             if (TurnCounter == 3)
@@ -71,26 +71,26 @@ public class Round
             if (TurnCounter == 1)
             {
                 TrumpColor = topCard.Color;
-                CurrentPlayer.Hand.Add(topCard);
             }
             else if (TurnCounter == 2)
             {
                 if (trumpColor != null && trumpColor.Value != Game.Deck.Cards.First().Color)
                 {
                     TrumpColor = trumpColor.Value;
-                    CurrentPlayer.Hand.Add(topCard);
-                    await DrawRemainingCards();
-                    StartTricks();
                 }
                 else
                 {
                     throw new Exception();
                 }
             }
+            Game.Players.ElementAt(CurrentIndex).Hand.Add(topCard);
+            Game.Deck.Cards.Remove(topCard);
+            await DrawRemainingCards();
+            StartTricks();
         }
         else
         {
-            CurrentPlayer = Game.Players.ElementAt((StarterIndex + 1) % 4);
+            CurrentIndex = (CurrentIndex + 1) % 4;
             await PickOrPass();
         }
     }
@@ -99,7 +99,7 @@ public class Round
     {
         foreach (var player in Game.Players)
         {
-            if (player.Id == CurrentPlayer.Id)
+            if (player.Id == Game.Players.ElementAt(CurrentIndex).Id)
             {
                 player.Hand.AddRange(Game.Deck.Cards.GetRange(0, 2));
                 Game.Deck.Cards.RemoveRange(0, 2);
@@ -118,7 +118,7 @@ public class Round
     {
         for (var i = 0; i < 8; i++)
         {
-            var trick = new Trick(CurrentPlayer, TrumpColor);
+            var trick = new Trick(Game.Players.ElementAt(StarterIndex), TrumpColor);
             trick.Start();
             Tricks.Add(trick);
         }
